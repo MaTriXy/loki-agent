@@ -188,6 +188,14 @@ Loki is built on [OpenClaw](https://github.com/openclaw/openclaw), the open-sour
 
 ---
 
+## See Loki in Action
+
+[![Loki Agent Demo](https://img.youtube.com/vi/dJSk8DYlHvI/maxresdefault.jpg)](https://www.youtube.com/watch?v=dJSk8DYlHvI)
+
+▶️ [Watch the full walkthrough on YouTube](https://www.youtube.com/watch?v=dJSk8DYlHvI)
+
+---
+
 ## Getting Started
 
 ### Option 1: One-command install (recommended)
