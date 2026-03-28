@@ -1,5 +1,9 @@
 # Loki: A Stateful Prototyping/Dev/Research/Ops Agent in your AWS account
 
+[![Loki Agent Demo](https://img.youtube.com/vi/dJSk8DYlHvI/maxresdefault.jpg)](https://www.youtube.com/watch?v=dJSk8DYlHvI)
+
+▶️ [Watch the full walkthrough on YouTube](https://www.youtube.com/watch?v=dJSk8DYlHvI)
+
 > **TL;DR — one command to deploy:**
 > ```
 > bash <(curl -sfL https://raw.githubusercontent.com/inceptionstack/loki-agent/main/install.sh)
@@ -187,15 +191,6 @@ Loki is built on [OpenClaw](https://github.com/openclaw/openclaw), the open-sour
 
 
 ---
-
-## See Loki in Action
-
-[![Loki Agent Demo](https://img.youtube.com/vi/dJSk8DYlHvI/maxresdefault.jpg)](https://www.youtube.com/watch?v=dJSk8DYlHvI)
-
-▶️ [Watch the full walkthrough on YouTube](https://www.youtube.com/watch?v=dJSk8DYlHvI)
-
----
-
 ## Getting Started
 
 ### Option 1: One-command install (recommended)
