@@ -723,7 +723,7 @@ setup_terraform_backend() {
   echo "    2) S3     -- remote with locking (recommended)"
   echo ""
   local choice
-  prompt "State storage" choice "1"
+  prompt "State storage" choice "2"
   [[ "$choice" == "2" ]] || return 0
 
   local bucket="${ENV_NAME}-tfstate-${ACCOUNT_ID}"
