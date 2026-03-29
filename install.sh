@@ -761,7 +761,7 @@ EOF
 
 terraform_init() {
   # AWS provider is ~500MB — CloudShell /home is ~1GB. Use /tmp for plugin cache.
-  if [[ ! -v TF_PLUGIN_CACHE_DIR ]]; then
+  if [[ -z "${TF_PLUGIN_CACHE_DIR:-}" ]]; then
     export TF_PLUGIN_CACHE_DIR="/tmp/terraform-plugin-cache"
   fi
   mkdir -p "$TF_PLUGIN_CACHE_DIR"
