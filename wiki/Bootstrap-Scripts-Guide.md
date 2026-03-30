@@ -47,6 +47,9 @@ Sets up disk monitoring, cleanup crons, and symlinks to keep the root volume lea
 ### BOOTSTRAP-DIAGRAMS.md — Architecture Diagrams
 Style guide for generating AWS architecture diagrams using draw.io with the re:Invent dark theme.
 
+### BOOTSTRAP-MODEL-CONFIG.md — Model Configuration
+Advanced model setup: configure primary/fallback models, LiteLLM proxy routing, cost optimization between Opus and Sonnet.
+
 ## Optional Bootstraps
 
 Add these based on your workflow needs.
@@ -65,9 +68,6 @@ Deploys a self-hosted Outline wiki on ECS Fargate with Aurora PostgreSQL. Great 
 
 ### BOOTSTRAP-GITHUBACTION-CODE-REVIEW.md — AI Code Review
 Adds a GitHub Action that runs Claude Code for automatic code review on PRs and commits.
-
-### BOOTSTRAP-MODEL-CONFIG.md — Model Configuration
-Advanced model setup: configure primary/fallback models, LiteLLM proxy routing, cost optimization between Opus and Sonnet.
 
 ### OPTIMIZE-TOO-LARGE-CONTEXT.md — Context Optimization
 Tips for reducing system prompt size when hitting context limits. Covers workspace file pruning, memory consolidation, and skill management.
