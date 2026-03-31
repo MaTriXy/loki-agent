@@ -3,6 +3,11 @@
 Sensitive values (gw_token, litellm_key, provider_key) can also be passed via env vars:
   GW_TOKEN_ENV, LITELLM_KEY_ENV, PROVIDER_KEY_ENV (env takes precedence over argv)"""
 import json, sys, os
+
+if len(sys.argv) < 5:
+    print("Usage: config-gen.py bedrock_region model gw_port gw_token [model_mode litellm_url litellm_key litellm_model provider_key]", file=sys.stderr)
+    sys.exit(1)
+
 bedrock_region = sys.argv[1]
 model = sys.argv[2]
 gw_port = sys.argv[3]

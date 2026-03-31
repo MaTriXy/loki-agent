@@ -52,7 +52,7 @@ while [[ $# -gt 0 ]]; do
     --port)        PACK_ARG_PORT="$2";        shift 2 ;;
     --model)       PACK_ARG_MODEL="$2";       shift 2 ;;
     --embed-model) PACK_ARG_EMBED_MODEL="$2"; shift 2 ;;
-    *) warn "Unknown argument: $1"; shift ;;
+    *) [[ $# -gt 1 ]] && [[ "$2" != --* ]] && shift 2 || shift ;;
   esac
 done
 

@@ -69,7 +69,7 @@ while [[ $# -gt 0 ]]; do
     --litellm-key|--litellm-api-key)     PACK_ARG_LITELLM_KEY="$2";     shift 2 ;;
     --litellm-model)  PACK_ARG_LITELLM_MODEL="$2";   shift 2 ;;
     --provider-key|--provider-api-key)   PACK_ARG_PROVIDER_KEY="$2";    shift 2 ;;
-    *) warn "Unknown argument: $1"; shift ;;
+    *) [[ $# -gt 1 ]] && [[ "$2" != --* ]] && shift 2 || shift ;;
   esac
 done
 
@@ -167,6 +167,7 @@ fi
 export NODE_BIN OC_MAIN GW_PORT GW_TOKEN NODE_PREFIX OC_VERSION
 export USER_HOME="${HOME}"
 envsubst < "${SERVICE_TPL}" > "${HOME}/.config/systemd/user/openclaw-gateway.service"
+chmod 600 "${HOME}/.config/systemd/user/openclaw-gateway.service"
 ok "Service unit written"
 
 # ── Enable and start service ──────────────────────────────────────────────────
