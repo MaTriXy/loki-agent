@@ -228,55 +228,57 @@ preflight_checks() {
   confirm_or_abort "Deploy to account ${ACCOUNT_ID} in ${REGION}?" "default_yes"
 
   check_permissions
-  check_vpc_quota
   check_existing_deployments
 }
 
 check_vpc_quota() {
+  local check_region="${DEPLOY_REGION:-$REGION}"
   echo ""
-  info "Checking VPC quota..."
+  info "Checking VPC quota in ${check_region}..."
   local vpc_count vpc_limit
-  vpc_count=$(aws ec2 describe-vpcs --region "$REGION" \
+  vpc_count=$(aws ec2 describe-vpcs --region "$check_region" \
     --query 'length(Vpcs)' --output text 2>/dev/null || echo "0")
   vpc_limit=$(aws service-quotas get-service-quota \
-    --service-code vpc --quota-code L-F678F1CE --region "$REGION" \
+    --service-code vpc --quota-code L-F678F1CE --region "$check_region" \
     --query 'Quota.Value' --output text 2>/dev/null || echo "5")
-  # Truncate decimals (quota API returns 5.0)
+  # Truncate decimals (quota API returns 5.0) and validate numeric
   vpc_limit=${vpc_limit%%.*}
+  [[ "$vpc_count" =~ ^[0-9]+$ ]] || vpc_count=0
+  [[ "$vpc_limit" =~ ^[0-9]+$ ]] || vpc_limit=5
 
   local remaining=$((vpc_limit - vpc_count))
   if [[ $remaining -le 0 ]]; then
     echo ""
-    echo -e "  ${RED}VPC quota reached: ${vpc_count}/${vpc_limit} VPCs in ${REGION}${NC}"
+    echo -e "  ${RED}VPC quota reached: ${vpc_count}/${vpc_limit} VPCs in ${check_region}${NC}"
     echo "  Loki needs 1 VPC. You have none remaining."
     echo ""
     if confirm "Request a VPC quota increase (+5) now?" "default_yes"; then
       local request_id
       request_id=$(aws service-quotas request-service-quota-increase \
         --service-code vpc --quota-code L-F678F1CE \
-        --desired-value $((vpc_limit + 5)) --region "$REGION" \
+        --desired-value $((vpc_limit + 5)) --region "$check_region" \
         --query 'RequestedQuota.Id' --output text 2>/dev/null || echo "")
       if [[ -n "$request_id" ]]; then
         ok "Quota increase requested (id: ${request_id})"
         info "New limit: $((vpc_limit + 5)) VPCs — usually approved within minutes"
-        info "Check status: https://${REGION}.console.aws.amazon.com/servicequotas/home/services/vpc/quotas/L-F678F1CE"
+        info "Check status: https://${check_region}.console.aws.amazon.com/servicequotas/home/services/vpc/quotas/L-F678F1CE"
         echo ""
-        confirm_or_abort "Wait and retry, or continue anyway (may fail)?"
+        confirm_or_abort "Continue with deployment (quota increase pending)?" "default_yes"
       else
         warn "Could not request quota increase automatically"
-        echo "  Request manually: https://${REGION}.console.aws.amazon.com/servicequotas/home/services/vpc/quotas/L-F678F1CE"
+        echo "  Request manually: https://${check_region}.console.aws.amazon.com/servicequotas/home/services/vpc/quotas/L-F678F1CE"
         confirm_or_abort "Continue anyway (deploy will likely fail)?"
       fi
     else
       confirm_or_abort "Continue anyway (deploy will likely fail)?"
     fi
   elif [[ $remaining -le 1 ]]; then
-    warn "VPC quota is tight: ${vpc_count}/${vpc_limit} VPCs in ${REGION} (${remaining} remaining)"
+    warn "VPC quota is tight: ${vpc_count}/${vpc_limit} VPCs in ${check_region} (${remaining} remaining)"
     echo "  Loki needs 1 VPC."
     if confirm "Request a quota increase (+5) as a precaution?" ; then
       aws service-quotas request-service-quota-increase \
         --service-code vpc --quota-code L-F678F1CE \
-        --desired-value $((vpc_limit + 5)) --region "$REGION" >/dev/null 2>&1 \
+        --desired-value $((vpc_limit + 5)) --region "$check_region" >/dev/null 2>&1 \
         && ok "Quota increase requested (+5)" \
         || warn "Could not request quota increase (non-fatal)"
     fi
@@ -1060,6 +1062,7 @@ main() {
   preflight_checks
   choose_deploy_method
   collect_config
+  check_vpc_quota  # Run after collect_config so we use DEPLOY_REGION
   build_deploy_params  # Populate parameter arrays from user config
   show_summary
 

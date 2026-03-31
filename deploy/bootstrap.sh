@@ -386,20 +386,20 @@ if [[ -f "$PACK_PROFILE" ]]; then
   source "$PACK_PROFILE"
 
   # Write aliases to ec2-user .bashrc
-  sudo -u ec2-user bash -c "cat >> ~/.bashrc << 'ALIASES_BLOCK'
+  sudo -u ec2-user tee -a /home/ec2-user/.bashrc > /dev/null << ALIASES_BLOCK
 ${PACK_ALIASES}
-ALIASES_BLOCK"
+ALIASES_BLOCK
 
-  # Write welcome banner to ec2-user .bashrc
-  sudo -u ec2-user bash -c "cat >> ~/.bashrc << 'BANNER_BLOCK'
+  # Write welcome banner to ec2-user .bashrc (unquoted heredoc: \$ → $ at write time, ${PACK_*} expanded by outer shell)
+  sudo -u ec2-user tee -a /home/ec2-user/.bashrc > /dev/null << BANNER_BLOCK
 
 # Welcome banner (only for interactive login shells)
-if [[ \\\$- == *i* ]] && [[ -z \"\\\$LOKI_BANNER_SHOWN\" ]]; then
+if [[ \$- == *i* ]] && [[ -z "\$LOKI_BANNER_SHOWN" ]]; then
   export LOKI_BANNER_SHOWN=1
   printf '\n\033[1;35m${PACK_BANNER_EMOJI} InceptionStack ${PACK_BANNER_NAME}\033[0m\n\n'
   printf '${PACK_BANNER_COMMANDS}\n'
 fi
-BANNER_BLOCK"
+BANNER_BLOCK
   ok "Pack shell profile added to .bashrc (${PACK_NAME})"
 else
   warn "No shell profile found for pack ${PACK_NAME}"
