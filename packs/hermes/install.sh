@@ -66,7 +66,7 @@ log "region=${REGION} model=${MODEL} bedrockify-port=${BEDROCKIFY_PORT}"
 
 # ── Prerequisites ─────────────────────────────────────────────────────────────
 step "Checking prerequisites"
-require_cmd curl
+require_cmd curl envsubst
 
 # Verify bedrockify is running
 HEALTH="$(curl -sf "http://127.0.0.1:${BEDROCKIFY_PORT}/" 2>&1)" || true
@@ -118,6 +118,7 @@ if [[ ! -f "${ENV_TPL}" ]]; then
 fi
 
 envsubst < "${ENV_TPL}" > "${HOME}/.hermes/.env"
+chmod 600 "${HOME}/.hermes/.env" "${HOME}/.hermes/config.yaml"
 ok "Hermes env written: ${HOME}/.hermes/.env"
 
 # ── Verify end-to-end ─────────────────────────────────────────────────────────

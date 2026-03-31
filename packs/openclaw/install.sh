@@ -43,7 +43,7 @@ Options:
   --model          Default Bedrock model ID        (default: us.anthropic.claude-opus-4-6-v1)
   --port           Gateway port                    (default: 3001)
   --token          Gateway auth token              (default: auto-generated)
-  --model-mode     bedrock | litellm | provider-key (default: bedrock)
+  --model-mode     bedrock | litellm | api-key   (default: bedrock)
   --litellm-url    LiteLLM base URL (litellm mode)
   --litellm-key    LiteLLM API key  (litellm mode)
   --litellm-model  LiteLLM model ID (litellm mode, default: claude-opus-4-6)
@@ -88,7 +88,7 @@ log "region=${REGION} model=${MODEL} port=${GW_PORT} mode=${MODEL_MODE}"
 
 # ── Prerequisites ─────────────────────────────────────────────────────────────
 step "Checking prerequisites"
-require_cmd node npm python3 openssl
+require_cmd node npm python3 openssl envsubst
 
 NODE_VERSION="$(node --version 2>/dev/null || echo unknown)"
 ok "node found: ${NODE_VERSION}"
@@ -135,6 +135,7 @@ if [[ ! -f "${CONFIG_GEN}" ]]; then
   fail "config-gen.py not found at ${CONFIG_GEN}"
 fi
 
+GW_TOKEN_ENV="${GW_TOKEN}" LITELLM_KEY_ENV="${LITELLM_KEY}" PROVIDER_KEY_ENV="${PROVIDER_KEY}" \
 python3 "${CONFIG_GEN}" \
   "${REGION}"        \
   "${MODEL}"         \

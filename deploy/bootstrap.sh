@@ -18,6 +18,15 @@ set -euo pipefail
 LOGFILE="${LOGFILE:-/var/log/loki-bootstrap.log}"
 exec > >(tee "$LOGFILE") 2>&1
 
+# Trap for unexpected exits — clean up SSM publisher and signal CFN failure
+trap '
+  echo "[FAIL] Bootstrap exited unexpectedly at line $LINENO" >&2
+  touch /tmp/loki-bootstrap-done
+  if [[ -n "${STACK_NAME:-}" ]]; then
+    /opt/aws/bin/cfn-signal -e 1 --stack "${STACK_NAME}" --resource Instance --region "${REGION:-us-east-1}" 2>/dev/null || true
+  fi
+' ERR
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 step() { echo ""; echo "========================================"; echo "[STEP] $(date -u '+%H:%M:%S') $1"; echo "========================================"; }
 ok()   { echo "[OK]    $(date -u '+%H:%M:%S') $1"; }
@@ -200,7 +209,7 @@ ok "System updated"
 
 # ---- Dependencies ----
 step "System Dependencies"
-dnf install -y git jq htop tmux gnupg2-minimal libatomic
+dnf install -y git jq htop tmux gnupg2-minimal libatomic gettext
 ok "Packages installed"
 
 # ---- Mount data volume ----

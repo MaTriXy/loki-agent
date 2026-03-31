@@ -171,10 +171,10 @@ Parameters:
 
   OpenClawGatewayPort:
     Type: Number
-    Default: 18789
+    Default: 3001
     MinValue: 1024
     MaxValue: 65535
-    Description: "Internal port for the OpenClaw gateway service. Change only if port 18789 conflicts with other services."
+    Description: "Internal port for the OpenClaw gateway service. Change only if port 3001 conflicts with other services."
 
   BedrockRegion:
     Type: String

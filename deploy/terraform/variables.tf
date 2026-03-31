@@ -78,8 +78,8 @@ variable "key_pair_name" {
 
 variable "openclaw_gateway_port" {
   type        = number
-  default     = 18789
-  description = "Internal port for the OpenClaw gateway service. Change only if port 18789 conflicts with other services."
+  default     = 3001
+  description = "Internal port for the OpenClaw gateway service. Change only if port 3001 conflicts with other services."
 
   validation {
     condition     = var.openclaw_gateway_port >= 1024 && var.openclaw_gateway_port <= 65535

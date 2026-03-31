@@ -116,7 +116,7 @@ Full details: [Bootstrap Scripts Guide](https://github.com/inceptionstack/loki-a
 
 Files at the `deploy/` level are used by all deployment methods:
 
-- `openclaw-bootstrap.sh` — main EC2 bootstrap script (installs Node, OpenClaw, Claude Code, etc.)
+- `bootstrap.sh` — generic EC2 bootstrap dispatcher (installs system deps, runs pack install scripts)
 - `openclaw-config-gen.py` — generates Loki config based on model mode
 - `bedrock-motd.sh` — writes MOTD + fix script if Bedrock form submission fails
 - `litellm-setup.sh` — helper to patch an existing Loki config with LiteLLM proxy settings
