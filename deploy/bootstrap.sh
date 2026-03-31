@@ -159,22 +159,25 @@ fi
 
 # ── Write pack config JSON ────────────────────────────────────────────────────
 PACK_CONFIG="/tmp/loki-pack-config.json"
-cat > "${PACK_CONFIG}" << JSON
-{
-  "pack": "${PACK_NAME}",
-  "region": "${REGION}",
-  "model": "${MODEL}",
-  "gw_port": "${GW_PORT}",
-  "model_mode": "${MODEL_MODE}",
-  "bedrockify_port": "${BEDROCKIFY_PORT}",
-  "hermes_model": "${HERMES_MODEL}",
-  "litellm_url": "${LITELLM_URL}",
-  "litellm_key": "${LITELLM_KEY}",
-  "litellm_model": "${LITELLM_MODEL}",
-  "provider_key": "${PROVIDER_KEY}"
-}
-JSON
+jq -n \
+  --arg pack "$PACK_NAME" \
+  --arg region "$REGION" \
+  --arg model "$MODEL" \
+  --arg gw_port "$GW_PORT" \
+  --arg model_mode "$MODEL_MODE" \
+  --arg bedrockify_port "$BEDROCKIFY_PORT" \
+  --arg hermes_model "$HERMES_MODEL" \
+  --arg litellm_url "$LITELLM_URL" \
+  --arg litellm_key "$LITELLM_KEY" \
+  --arg litellm_model "$LITELLM_MODEL" \
+  --arg provider_key "$PROVIDER_KEY" \
+  '{pack:$pack, region:$region, model:$model, gw_port:$gw_port,
+    model_mode:$model_mode, bedrockify_port:$bedrockify_port,
+    hermes_model:$hermes_model, litellm_url:$litellm_url,
+    litellm_key:$litellm_key, litellm_model:$litellm_model,
+    provider_key:$provider_key}' > "${PACK_CONFIG}"
 chmod 600 "${PACK_CONFIG}"
+chown ec2-user:ec2-user "${PACK_CONFIG}"
 export PACK_CONFIG
 
 # ── Locate repo root ──────────────────────────────────────────────────────────
@@ -519,6 +522,10 @@ fi
 BEDROCK_EOF
 
 # ---- Complete ----
+# ---- Clean up config file (contains secrets) ----
+rm -f "${PACK_CONFIG}"
+info "Pack config cleaned up"
+
 step "Bootstrap Complete"
 touch /tmp/loki-bootstrap-done
 ok "Pack '${PACK_NAME}' bootstrap complete at $(date -u)"

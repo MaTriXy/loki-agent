@@ -141,12 +141,12 @@ python3 "${CONFIG_GEN}" \
   "${REGION}"        \
   "${MODEL}"         \
   "${GW_PORT}"       \
-  "${GW_TOKEN}"      \
+  ""                 \
   "${MODEL_MODE}"    \
   "${LITELLM_URL}"   \
-  "${LITELLM_KEY}"   \
+  ""                 \
   "${LITELLM_MODEL}" \
-  "${PROVIDER_KEY}"
+  ""
 
 chmod 600 "${HOME}/.openclaw/openclaw.json"
 ok "Config written and secured (mode=${MODEL_MODE})"
