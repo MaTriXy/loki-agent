@@ -1,6 +1,6 @@
 # BOOTSTRAP-MCPORTER.md — MCPorter Setup
 
-> **Applies to:** OpenClaw only
+> **Applies to:** All agents (with agent-specific sections below)
 
 > **Run this once on first boot.** If `memory/.bootstrapped-mcporter` exists, skip — you've already done this.
 
@@ -107,6 +107,38 @@ Report to the operator what MCP servers are configured and available.
 
 ---
 
+## OpenClaw-Specific Configuration
+
+OpenClaw uses MCPorter as its MCP integration layer. The setup above (config file, `mcporter call`, `mcporter list`) applies directly to OpenClaw.
+
 ## Hermes-Specific Configuration
 
-> Not applicable — MCPorter is an OpenClaw MCP tool integration. Hermes does not use the Model Context Protocol and has no equivalent MCP server infrastructure. Hermes interacts with AWS services directly via CLI commands.
+Hermes has **native MCP support** built in — no MCPorter needed. Configure MCP servers directly in `~/.hermes/config.yaml`:
+
+```yaml
+# In ~/.hermes/config.yaml
+mcp_servers:
+  aws-mcp:
+    command: "npx"
+    args: ["-y", "@anthropic-ai/aws-mcp"]
+    env:
+      AWS_REGION: "us-east-1"
+
+  filesystem:
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "/home/ec2-user"]
+```
+
+Hermes auto-discovers MCP tools at startup and registers them with prefixed names (e.g., `mcp_aws_mcp_<tool>`). They appear alongside built-in tools — no separate CLI needed.
+
+Hermes also supports **remote HTTP MCP servers**:
+
+```yaml
+mcp_servers:
+  remote_api:
+    url: "https://mcp.example.com/mcp"
+    headers:
+      Authorization: "Bearer ${API_KEY}"
+```
+
+To add the same AWS MCP servers that OpenClaw uses via MCPorter, translate the MCPorter config (`~/.openclaw/workspace/config/mcporter.json`) into the Hermes `mcp_servers:` YAML format above.

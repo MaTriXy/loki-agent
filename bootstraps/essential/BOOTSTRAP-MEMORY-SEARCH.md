@@ -97,14 +97,32 @@ Ask the agent to run `memory_search` with any query. It should return ranked res
 
 ## Hermes-Specific Configuration
 
-> Hermes does not have a built-in memory search system. However, bedrockify's `/v1/embeddings` endpoint is available on `localhost:8090` for any custom embedding workflows or scripts you want to build around the Hermes agent.
->
-> To use embeddings from a Hermes context:
-> ```bash
-> curl -s -X POST http://127.0.0.1:8090/v1/embeddings \
->   -H "Content-Type: application/json" \
->   -d '{"input": "your text here", "model": "amazon.titan-embed-text-v2:0"}'
-> ```
+Hermes has its own built-in memory system:
+
+- **MEMORY.md** (~2,200 chars) — agent's personal notes, environment facts, lessons learned
+- **USER.md** (~1,375 chars) — user preferences, communication style
+- **Session search** — FTS5 full-text search across all past sessions in `~/.hermes/state.db`
+
+Hermes memory is managed via the `memory` tool (add/replace/remove) and injected into the system prompt at session start. Session search uses `session_search` for finding past conversations.
+
+**Bedrockify embeddings** are still available on `localhost:8090` for custom embedding workflows or MCP-based memory extensions:
+
+```bash
+curl -s -X POST http://127.0.0.1:8090/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -d '{"input": "your text here", "model": "amazon.titan-embed-text-v2:0"}'
+```
+
+To configure Hermes memory limits:
+
+```yaml
+# In ~/.hermes/config.yaml
+memory:
+  memory_enabled: true
+  user_profile_enabled: true
+  memory_char_limit: 2200
+  user_char_limit: 1375
+```
 
 ## Supported Models
 

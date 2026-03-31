@@ -66,11 +66,22 @@ OpenClaw auto-discovers skills from the `skills/` directory in the workspace. Af
 
 ## Hermes-Specific Configuration
 
-Hermes also supports skills. After cloning the skills library into the workspace, configure Hermes to use the skills directory:
+Hermes has its own skills system at `~/.hermes/skills/` with auto-discovery, the `skill_manage` tool, and Skills Hub support. It also supports **external skill directories** — point it at the shared FastStart skills library:
 
-```bash
-# Skills are cloned to the same location
-ls ~/.openclaw/workspace/skills/
+```yaml
+# In ~/.hermes/config.yaml
+skills:
+  external_dirs:
+    - ~/.openclaw/workspace/skills
 ```
 
-Refer to Hermes documentation for how skills are loaded and invoked in your agent configuration.
+This makes all FastStart skills available alongside Hermes's built-in and agent-created skills. Local skills at `~/.hermes/skills/` take precedence if names conflict.
+
+Skills appear as slash commands (e.g. `/aws-mcp`), in `skills_list()`, and in natural conversation. Hermes loads them progressively to minimize token usage.
+
+To install additional skills from the Hermes Skills Hub:
+
+```bash
+hermes skills browse
+hermes skills install <skill-name>
+```

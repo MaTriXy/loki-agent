@@ -313,19 +313,38 @@ The exec provider setup above (Steps 1–7) is specific to OpenClaw's gateway se
 
 ## Hermes-Specific Configuration
 
-Hermes can also use AWS Secrets Manager. The approach differs from OpenClaw's exec provider protocol:
+Hermes manages secrets via `~/.hermes/.env` and supports `${VAR}` substitution in `config.yaml`:
 
-**Option 1: Environment injection at startup**
-Fetch secrets and inject them as environment variables in the Hermes systemd service:
-
+**Store secrets in `.env`:**
 ```bash
-# In the Hermes service ExecStartPre or a wrapper script:
-export API_KEY=$(aws secretsmanager get-secret-value --secret-id "your/secret" --query SecretString --output text)
+# ~/.hermes/.env
+TELEGRAM_BOT_TOKEN=your-bot-token
+GITHUB_TOKEN=ghp_xxx
 ```
 
-**Option 2: Direct AWS CLI in scripts**
-```bash
-aws secretsmanager get-secret-value --secret-id "your/secret" --query SecretString --output text
+**Reference them in config:**
+```yaml
+# ~/.hermes/config.yaml
+mcp_servers:
+  github:
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-github"]
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
 ```
 
-The EC2 Instance Role Permissions and Storing Secrets sections above apply to both agents — secrets are stored the same way regardless of which agent reads them.
+**For AWS Secrets Manager integration**, fetch secrets at startup and inject them:
+
+```bash
+# In a wrapper script or systemd ExecStartPre:
+export API_KEY=$(aws secretsmanager get-secret-value \
+  --secret-id "your/secret" --query SecretString --output text)
+```
+
+Or use `hermes config set` to store them:
+```bash
+hermes config set TELEGRAM_BOT_TOKEN $(aws secretsmanager get-secret-value \
+  --secret-id "openclaw/telegram-bot-token" --query SecretString --output text)
+```
+
+The EC2 Instance Role Permissions and Storing Secrets sections above apply to both agents — secrets are stored the same way in AWS Secrets Manager regardless of which agent reads them.
