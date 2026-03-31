@@ -28,7 +28,19 @@ trap '
 ' ERR
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
-step() { echo ""; echo "========================================"; echo "[STEP] $(date -u '+%H:%M:%S') $1"; echo "========================================"; }
+STEP_N=0
+STEP_TOTAL=16
+step() {
+  STEP_N=$((STEP_N + 1))
+  echo ""
+  echo "========================================"
+  echo "[STEP ${STEP_N}/${STEP_TOTAL}] $(date -u '+%H:%M:%S') $1"
+  echo "========================================"
+  # Publish current step to SSM for the installer to display
+  aws ssm put-parameter --name "/loki/setup-step" \
+    --value "${STEP_N}/${STEP_TOTAL} $1" \
+    --type String --overwrite --region "${REGION}" >/dev/null 2>&1 || true
+}
 ok()   { echo "[OK]    $(date -u '+%H:%M:%S') $1"; }
 fail() { echo "[FAIL]  $(date -u '+%H:%M:%S') $1"; }
 info() { echo "[INFO]  $(date -u '+%H:%M:%S') $1"; }

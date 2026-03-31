@@ -875,9 +875,17 @@ wait_for_bootstrap() {
       output=$(aws ssm get-command-invocation --command-id "$cmd_id" \
         --instance-id "$INSTANCE_ID" --region "$DEPLOY_REGION" \
         --query 'StandardOutputContent' --output text 2>/dev/null || echo "")
-      [[ "$output" == *"READY"* ]] && { ok "Loki is ready!"; return; }
+      [[ "$output" == *"READY"* ]] && { echo ""; ok "Loki is ready!"; return; }
     fi
-    echo -ne "\r  Bootstrapping... (${i}/30)    "
+    # Read current step from SSM parameter
+    local current_step
+    current_step=$(aws ssm get-parameter --name "/loki/setup-step" \
+      --region "$DEPLOY_REGION" --query 'Parameter.Value' --output text 2>/dev/null || echo "")
+    if [[ -n "$current_step" ]]; then
+      printf "\r  ⏳ [%s] %-50s" "$current_step" ""
+    else
+      printf "\r  ⏳ Bootstrapping... (%d/30) %-30s" "$i" ""
+    fi
     sleep 10
   done
   warn "Bootstrap check timed out — Loki may still be starting up"
