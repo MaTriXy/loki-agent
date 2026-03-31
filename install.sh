@@ -31,7 +31,7 @@ REPO_URL="https://github.com/inceptionstack/loki-agent.git"
 DOCS_URL="https://github.com/inceptionstack/loki-agent/wiki"
 TEMPLATE_RAW_URL="https://raw.githubusercontent.com/inceptionstack/loki-agent/main/deploy/cloudformation/template.yaml"
 SSM_DOC_NAME="Loki-Session"
-INSTALLER_VERSION="0.3.0"
+INSTALLER_VERSION="0.4.0"
 
 # Deploy method constants
 DEPLOY_CFN_CONSOLE=1
@@ -39,8 +39,8 @@ DEPLOY_CFN_CLI=2
 DEPLOY_SAM=3
 DEPLOY_TERRAFORM=4
 # Stamped at release; fall back to git info at runtime
-INSTALLER_COMMIT="${INSTALLER_COMMIT:-dev}"
-INSTALLER_DATE="${INSTALLER_DATE:-2026-03-21 10:30}"
+INSTALLER_COMMIT="${INSTALLER_COMMIT:-$(git -C "$(dirname "$0")" rev-parse --short HEAD 2>/dev/null || echo dev)}"
+INSTALLER_DATE="${INSTALLER_DATE:-$(git -C "$(dirname "$0")" log -1 --format='%ci' 2>/dev/null | cut -d' ' -f1,2 || echo unknown)}"
 
 # Detect AWS CloudShell (limited ~1GB home dir, use /tmp for large files)
 IS_CLOUDSHELL=false
